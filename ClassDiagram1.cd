@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="LibraryManagementSystem.UserManagement">
+    <Position X="8.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIEGAAAABwAAAAEAAACAAAAAgAAAAA=</HashCode>
+      <FileName>AccountManagement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LibraryManagementSystem.Library">
+    <Position X="3.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAIAAAEAAAAAAAAAAAAAAAEAAAQAAQA=</HashCode>
+      <FileName>Library.cs</FileName>
+      <NewMemberFileName>Program.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LibraryManagementSystem.Program">
+    <Position X="12.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LibraryManagementSystem.PasswordManager">
+    <Position X="10.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AccountManagement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LibraryManagementSystem.LibrarianMenu">
+    <Position X="7" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LibrarianMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LibraryManagementSystem.FileHandler">
+    <Position X="5.25" Y="2.25" Width="1.5" />
+    <NestedTypes>
+      <Class Name="LibraryManagementSystem.FileHandler.BookTitleComparer" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>FileHandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>IBAAAEAABAAQAAIEACAgAQABRAEAEAAgAAIQAwQAAAA=</HashCode>
+      <FileName>FileHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LibraryManagementSystem.BookHandler">
+    <Position X="1" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>BookHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LibraryManagementSystem.BookItem">
+    <Position X="1" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQQgAAMAAiAABAIgAAAAAAACAAAIAwQAAAEA=</HashCode>
+      <FileName>Program.cs</FileName>
+      <NewMemberFileName>BookHandler.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
