@@ -8,7 +8,7 @@ namespace LibraryManagementSystem
     // Abstract Class
     public abstract class BookItem
     {
-        private string? isbn, title, author, publisher, edition;
+        private string? isbn, title, author, publisher, edition, category;
         private int quantity, availQuantity, yearOfPublication;
 
         //Book APA Format
@@ -18,6 +18,7 @@ namespace LibraryManagementSystem
         public int YearOfPublication { get => yearOfPublication; set => yearOfPublication = value; }
         public string? Publisher { get => publisher; set => publisher = value; }
         public string? Edition { get => edition; set => edition = value; }
+        public string? Category { get => category; set => category = value; }   
 
         //Stats
         public int Quantity { get => quantity; set => quantity = value; }

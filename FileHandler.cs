@@ -212,54 +212,11 @@ namespace LibraryManagementSystem
 
             try
             {
-                using(StreamReader reader = new StreamReader(usersFile))
-                {
-                    string? line;
-                    while((line = reader.ReadLine()) != null)
-                    {
-                        // Skip empty lines
-                        if (string.IsNullOrWhiteSpace(line))
-                            continue;
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"{"UserID",-15} | {"Name",-25} | {"Role",-15}");
+                Console.WriteLine(new string('-', 60));
+                Console.ResetColor();
 
-                        // Split the line into parts
-                        string[] parts = line.Split('|');
-
-                        if (parts.Length >= 4) // Ensure the line has all required fields
-                        {
-                            string userInfo = $"UserID: {parts[0]}, Name: {parts[1]}, Role: {parts[3]}";
-
-                            // Add the user to the list
-                            users.Add(userInfo);
-
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Warning: Skipping malformed line: {line}");
-                        }
-                    }
-                }
-            }
-            catch (IOException ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Error loading users: {ex.Message}"); Console.ResetColor();
-            }
-
-            return users;
-        }
-
-        public static List<string> LoadAllBooks()
-        {
-            List<string> loadedBooks = new List<string>();
-
-            if (!File.Exists(usersFile))
-            {
-                Console.WriteLine("User file does not exist. No users to load.");
-                return loadedBooks;
-            }
-
-            try
-            {
                 using (StreamReader reader = new StreamReader(usersFile))
                 {
                     string? line;
@@ -272,13 +229,13 @@ namespace LibraryManagementSystem
                         // Split the line into parts
                         string[] parts = line.Split('|');
 
-                        if (parts.Length >= 7) // Ensure the line has all required fields
+                        if (parts.Length >= 4) // Ensure the line has all required fields
                         {
-                            string bookInfo = $"BookID: {parts[0]} | Title: {parts[1]} | Author: {parts[2]} | Publisher: {parts[3]} | Edition: {parts[4]} | " +
-                                              $"Year of Publication: {parts[5]} | Quantity: {parts[6]}";
+                            // Format the user details as a tabular row
+                            Console.WriteLine($"{parts[0],-15} | {parts[1],-25} | {parts[3],-15}");
 
-                            // Add the book to the list
-                            loadedBooks.Add(bookInfo);
+                            // Add the user info to the list for further processing if needed
+                            users.Add($"{parts[0]}|{parts[1]}|{parts[3]}");
                         }
                         else
                         {
@@ -286,9 +243,66 @@ namespace LibraryManagementSystem
                         }
                     }
                 }
+            }
+            catch (IOException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Error loading users: {ex.Message}");
+                Console.ResetColor();
+            }
 
-                // Sort books alphabetically by Title using a custom comparer
-                loadedBooks.Sort(new BookTitleComparer());
+            return users;
+        }
+
+        public static List<string> LoadAllBooks()
+        {
+            List<string> loadedBooks = new List<string>();
+
+            if (!File.Exists(booksFile)) // Correct file reference for books
+            {
+                Console.WriteLine("Books file does not exist. No books to load.");
+                return loadedBooks;
+            }
+
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"{"BookID",-10} | {"Title",-30} | {"Author",-20} | {"Publisher",-20} | {"Edition",-10} | {"Year",-6} | {"Quantity",-8} | {"Category",-15}");
+                Console.WriteLine(new string('-', 120));
+                Console.ResetColor();
+
+                using (StreamReader reader = new StreamReader(booksFile))
+                {
+                    string? line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        // Skip empty lines
+                        if (string.IsNullOrWhiteSpace(line))
+                            continue;
+
+                        // Split the line into parts
+                        string[] parts = line.Split('|');
+
+                        if (parts.Length >= 8) // Ensure the line has all required fields
+                        {
+                            string bookInfo = $"{parts[0],-10} | {parts[1],-30} | {parts[2],-20} | {parts[3],-20} | {parts[4],-10} | {parts[5],-6} | {parts[6],-8} | {parts[7],-15}";
+
+                            // Print the book in tabular form
+                            Console.WriteLine(bookInfo);
+
+                            // Add the book info to the list for further use
+                            loadedBooks.Add(bookInfo);
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine($"Warning: Skipping malformed line: {line}");
+                            Console.ResetColor();
+                        }
+                    }
+                }
+
+                Console.WriteLine(new string('-', 120));
             }
             catch (IOException ex)
             {
@@ -328,17 +342,14 @@ namespace LibraryManagementSystem
         }
 
         //Book File Handling
-        public static void AddBook(string title, string author, int yearOfPublication, string
-            publisher, string edition, int quantity)
-
-
+        public static void AddBook(string title, string author, int yearOfPublication, string publisher, string edition, int quantity, string category)
         {
-            var isbnTemp = GenerateUniqueISBN();
+            var isbnTemp = GenerateUniqueISBN(); // Generate a unique ISBN
             try
             {
                 using (StreamWriter writer = new StreamWriter(booksFile, append: true))
                 {
-                    writer.WriteLine($"{isbnTemp}|{title}|{author}|{publisher}|{edition}|{yearOfPublication}|{quantity}");
+                    writer.WriteLine($"{isbnTemp}|{title}|{author}|{publisher}|{edition}|{yearOfPublication}|{quantity}|{category}");
                 }
                 ShowMessageWithDelay("Book added successfully!", ConsoleColor.Green);
             }
@@ -431,7 +442,7 @@ namespace LibraryManagementSystem
                         if (string.IsNullOrWhiteSpace(line))
                             continue;
 
-                        books.Add(line);  // Add the line (book entry) to the list
+                        books.Add(line); // Add the line (book entry) to the list
                     }
                 }
 
@@ -453,26 +464,26 @@ namespace LibraryManagementSystem
                     }
                 }
 
+                // Display table header
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("List of Books:");
-                Console.WriteLine("-----------------------------------------------------");
+                Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine($"{"BookID",-10} | {"Title",-30} | {"Author",-20} | {"Publisher",-20} | {"Edition",-10} | {"Year",-6} | {"Quantity",-8} | {"Category",-15}");
+                Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
                 Console.ResetColor();
 
+                // Display each book in tabular form
                 foreach (string book in books)
                 {
                     string[] parts = book.Split('|');
-                    if (parts.Length >= 7) // Ensure the line has all required fields
-                    {
-                        Console.WriteLine($"BookID: {parts[0]}");
-                        Console.WriteLine($"Title: {parts[1]}");
-                        Console.WriteLine($"Author: {parts[2]}");
-                        Console.WriteLine($"Publisher: {parts[3]}");
-                        Console.WriteLine($"Edition: {parts[4]}");
-                        Console.WriteLine($"Year of Publication: {parts[5]}");
-                        Console.WriteLine($"Quantity: {parts[6]}");
-                        Console.WriteLine("-----------------------------------------------------");
+                    if (parts.Length >= 8) // Ensure the line has all required fields
+            {
+                        Console.WriteLine($"{parts[0],-10} | {parts[1],-30} | {parts[2],-20} | {parts[3],-20} | {parts[4],-10} | {parts[5],-6} | {parts[6],-8} | {parts[7],-15}");
                     }
                 }
+
+                // Table footer
+                Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------");
             }
             catch (IOException ex)
             {
@@ -537,7 +548,7 @@ namespace LibraryManagementSystem
             }
         }
 
-        public static List<string> SearchBookByTitleWildcard(string partialTitle)
+        public static List<string> SearchBook(string partialTitle, string? category = null)
         {
             CheckFolder();
             List<string> searchResults = new List<string>();
@@ -557,13 +568,19 @@ namespace LibraryManagementSystem
                     string? line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        // Split the line into parts to identify the title
+                        // Split the line into parts (BookID, Title, Author, Publisher, Edition, Year, Quantity, Category)
                         string[] parts = line.Split('|');
 
-                        if (parts.Length >= 2) // Ensure the line contains at least BookID and Title
+                        if (parts.Length >= 8) // Ensure the line contains at least BookID, Title, and Category
                         {
                             string bookTitle = parts[1];
-                            if (bookTitle.IndexOf(partialTitle, StringComparison.OrdinalIgnoreCase) >= 0)
+                            string bookCategory = parts[7]; // Assuming Category is the 8th field in the line
+
+                            // Check if the title or category matches the search criteria
+                            bool titleMatches = bookTitle.IndexOf(partialTitle, StringComparison.OrdinalIgnoreCase) >= 0;
+                            bool categoryMatches = string.IsNullOrWhiteSpace(category) || bookCategory.IndexOf(category, StringComparison.OrdinalIgnoreCase) >= 0;
+
+                            if (titleMatches && categoryMatches)
                             {
                                 searchResults.Add(line);
                             }
@@ -581,7 +598,10 @@ namespace LibraryManagementSystem
             if (searchResults.Count == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"No books found matching the title: {partialTitle}");
+                string message = string.IsNullOrEmpty(category) ?
+                                 $"No books found matching the title: {partialTitle}" :
+                                 $"No books found matching the title: {partialTitle} and category: {category}";
+                Console.WriteLine(message);
                 Console.ResetColor();
             }
 
@@ -600,15 +620,48 @@ namespace LibraryManagementSystem
                 return;
             }
 
+            string borrowedBooksFile = @"C:\LibraryData\borrowedBooks.txt";
+
             try
             {
+                int totalBooks = 0;
+                int totalAvailable = 0;
+                int totalBorrowedBooks = 0;
+
+                // Track borrowed books
+                Dictionary<string, int> borrowedBooks = new Dictionary<string, int>();
+
+                // Read borrowed books file to count the number of times each book has been borrowed
+                if (File.Exists(borrowedBooksFile))
+                {
+                    using (StreamReader borrowedReader = new StreamReader(borrowedBooksFile))
+                    {
+                        string? borrowedLine;
+                        while ((borrowedLine = borrowedReader.ReadLine()) != null)
+                        {
+                            string[] borrowedParts = borrowedLine.Split('|');
+                           
+                                string borrowedTitle = borrowedParts[1];
+                                if (borrowedBooks.ContainsKey(borrowedTitle))
+                                    borrowedBooks[borrowedTitle]++;
+                                else
+                                   borrowedBooks[borrowedTitle] = 1;
+                            
+                        }
+                    }
+                    totalBorrowedBooks = borrowedBooks.Count;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("Current Inventory:");
+                Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+                Console.WriteLine($"{"BookID",-10} | {"Title",-30} | {"Author",-20} | {"Publisher",-20} | {"Edition",-10} | {"Year",-6} | {"Quantity",-8} | {"Category",-15} | {"Status",-12} ");
+                Console.WriteLine("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+                Console.ResetColor();
+
                 using (StreamReader reader = new StreamReader(booksFile))
                 {
                     string? line;
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("Current Inventory:");
-                    Console.WriteLine("-----------------------------------------------------");
-                    Console.ResetColor();
 
                     while ((line = reader.ReadLine()) != null)
                     {
@@ -618,16 +671,29 @@ namespace LibraryManagementSystem
 
                         // Split the line into parts
                         string[] parts = line.Split('|');
-                        if (parts.Length >= 7) // Ensure the line has all required fields
+                        if (parts.Length >= 8) // Ensure the line has all required fields, including Category
                         {
-                            Console.WriteLine($"BookID: {parts[0]}");
-                            Console.WriteLine($"Title: {parts[1]}");
-                            Console.WriteLine($"Author: {parts[2]}");
-                            Console.WriteLine($"Publisher: {parts[3]}");
-                            Console.WriteLine($"Edition: {parts[4]}");
-                            Console.WriteLine($"Year of Publication: {parts[5]}");
-                            Console.WriteLine($"Quantity: {parts[6]}");
-                            Console.WriteLine("-----------------------------------------------------");
+                            string bookID = parts[0];
+                            string title = parts[1];
+                            string author = parts[2];
+                            string publisher = parts[3];
+                            string edition = parts[4];
+                            string year = parts[5];
+                            int quantity = int.TryParse(parts[6], out int qty) ? qty : 0;
+                            string category = parts[7];
+
+                            // Calculate stock status
+                            string stockStatus = quantity > 0 ? "In Stock" : "Out of Stock";
+
+                            // Update totals
+                            totalAvailable += quantity > 0 ? quantity : 0;
+                            totalBooks = totalAvailable + totalBorrowedBooks;
+
+                            if (borrowedBooks.ContainsKey(title))
+                                totalBorrowedBooks += borrowedBooks[title];
+
+                            // Display each book in tabular format
+                            Console.WriteLine($"{bookID,-10} | {title,-30} | {author,-20} | {publisher,-20} | {edition,-10} | {year,-6} | {quantity,-8} | {category,-15} | {stockStatus,-12}");
                         }
                         else
                         {
@@ -637,6 +703,15 @@ namespace LibraryManagementSystem
                         }
                     }
                 }
+
+                // Inventory summary at the end
+                Console.WriteLine("----------------------------------------------------------------------------------------------------------------------------------------------------------");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Summary:");
+                Console.WriteLine($"Total Books: {totalBooks}");
+                Console.WriteLine($"Available Books: {totalAvailable}");
+                Console.WriteLine($"Borrowed Books: {totalBorrowedBooks}");
+                Console.ResetColor();
             }
             catch (IOException ex)
             {
@@ -666,6 +741,30 @@ namespace LibraryManagementSystem
                 return;
             }
 
+            string borrowedBooksFile = @"C:\LibraryData\borrowedBooks.txt";
+
+            // Check if the user has already borrowed the specific book
+            if (File.Exists(borrowedBooksFile))
+            {
+                using (StreamReader borrowedReader = new StreamReader(borrowedBooksFile))
+                {
+                    string borrowedLine;
+                    while ((borrowedLine = borrowedReader.ReadLine()) != null)
+                    {
+                        string[] borrowedParts = borrowedLine.Split('|');
+                        if (borrowedParts.Length >= 2 &&
+                            borrowedParts[0].Equals(userId, StringComparison.OrdinalIgnoreCase) &&
+                            borrowedParts[1].Equals(bookTitle, StringComparison.OrdinalIgnoreCase))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"Error: You have already borrowed the book '{bookTitle}'.");
+                            Console.ResetColor();
+                            return;
+                        }
+                    }
+                }
+            }
+
             string tempFile = Path.GetTempFileName();
             bool bookFound = false;
 
@@ -687,7 +786,7 @@ namespace LibraryManagementSystem
                                 bookFound = true;
 
                                 // Log borrowing details
-                                using (StreamWriter borrowLogWriter = new StreamWriter(@"C:\LibraryData\borrowedBooks.txt", append: true))
+                                using (StreamWriter borrowLogWriter = new StreamWriter(borrowedBooksFile, append: true))
                                 {
                                     borrowLogWriter.WriteLine($"{userId}|{bookTitle}|{DateTime.Now:yyyy-MM-dd}");
                                 }
@@ -864,5 +963,92 @@ namespace LibraryManagementSystem
                 Console.ResetColor();
             }
         }
+
+        public static void UpdateBook(string bookTitle)
+        {
+            CheckFolder();
+
+            if (!File.Exists(booksFile))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error: The books file does not exist.");
+                Console.ResetColor();
+                return;
+            }
+
+            List<string> updatedBooks = new List<string>();
+            bool bookFound = false;
+
+            try
+            {
+                using (StreamReader reader = new StreamReader(booksFile))
+                {
+                    string? line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        string[] parts = line.Split('|');
+                        if (parts.Length >= 8 && parts[1].Equals(bookTitle, StringComparison.OrdinalIgnoreCase))
+                        {
+                            bookFound = true;
+
+                            // Display current information
+                            Console.WriteLine("Current Book Information:");
+                            Console.WriteLine($"Title: {parts[1]}, Author: {parts[2]}, Publisher: {parts[3]}, Edition: {parts[4]}, Year: {parts[5]}, Quantity: {parts[6]}, Category: {parts[7]}");
+
+                            // Ask for new information
+                            Console.WriteLine("\nEnter new information (leave blank to keep current value):");
+
+                            Console.Write("New Title: ");
+                            string newTitle = Console.ReadLine();
+                            Console.Write("New Author: ");
+                            string newAuthor = Console.ReadLine();
+                            Console.Write("New Publisher: ");
+                            string newPublisher = Console.ReadLine();
+                            Console.Write("New Edition: ");
+                            string newEdition = Console.ReadLine();
+                            Console.Write("New Year of Publication: ");
+                            string newYear = Console.ReadLine();
+                            Console.Write("New Category: ");
+                            string newCategory = Console.ReadLine();
+
+                            // Replace only the fields that are not blank
+                            string? newQuantity = null;
+                            parts[1] = string.IsNullOrWhiteSpace(newTitle) ? parts[1] : newTitle;
+                            parts[2] = string.IsNullOrWhiteSpace(newAuthor) ? parts[2] : newAuthor;
+                            parts[3] = string.IsNullOrWhiteSpace(newPublisher) ? parts[3] : newPublisher;
+                            parts[4] = string.IsNullOrWhiteSpace(newEdition) ? parts[4] : newEdition;
+                            parts[5] = string.IsNullOrWhiteSpace(newYear) ? parts[5] : newYear;
+                            parts[6] = string.IsNullOrWhiteSpace(newQuantity) ? parts[6] : newQuantity;
+                            parts[7] = string.IsNullOrWhiteSpace(newCategory) ? parts[7] : newCategory;
+
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("\nBook information updated successfully!");
+                            Console.ResetColor();
+                        }
+
+                        updatedBooks.Add(string.Join("|", parts));
+                    }
+                }
+
+                if (bookFound)
+                {
+                    // Write updated information back to the file
+                    File.WriteAllLines(booksFile, updatedBooks);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Error: Book titled '{bookTitle}' not found.");
+                    Console.ResetColor();
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Error updating book: {ex.Message}");
+                Console.ResetColor();
+            }
+        }
+
     }
 }

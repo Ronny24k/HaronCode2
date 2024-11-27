@@ -109,10 +109,10 @@ namespace LibraryManagementSystem
                     case "4":
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("Search for a Book by Title");
+                        Console.WriteLine("Search for a Book by Title and/or Category");
                         Console.ResetColor();
 
-                        Console.Write("Enter a keyword to search for books: ");
+                        Console.Write("Enter a keyword to search for books by title: ");
                         string searchKeyword = Console.ReadLine();
 
                         if (string.IsNullOrWhiteSpace(searchKeyword))
@@ -121,8 +121,12 @@ namespace LibraryManagementSystem
                             break;
                         }
 
-                        // Call the SearchBookByTitleWildcard method from FileHandler
-                        List<string> searchResults = FileHandler.SearchBookByTitleWildcard(searchKeyword);
+                        // Ask for category (optional)
+                        Console.Write("Enter a category to search (leave blank to skip): ");
+                        string searchCategory = Console.ReadLine();
+
+                        // Call the updated SearchBook method from FileHandler
+                        List<string> searchResults = FileHandler.SearchBook(searchKeyword, searchCategory);
 
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -139,7 +143,10 @@ namespace LibraryManagementSystem
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"No books found matching the keyword: {searchKeyword}");
+                            string message = string.IsNullOrEmpty(searchCategory) ?
+                                             $"No books found matching the title: {searchKeyword}" :
+                                             $"No books found matching the title: {searchKeyword} and category: {searchCategory}";
+                            Console.WriteLine(message);
                             Console.ResetColor();
                         }
 
@@ -161,7 +168,8 @@ namespace LibraryManagementSystem
                         Console.ForegroundColor= ConsoleColor.Green;
                         Console.WriteLine("Exiting the program... Goodbye!");
                         Console.ResetColor();
-                        return; //exits the loop
+                        Environment.Exit(0);
+                        break;
 
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

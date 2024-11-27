@@ -40,8 +40,9 @@ namespace LibraryManagementSystem
                 Console.WriteLine("│ 7. Search Books               │");
                 Console.WriteLine("│ 8. View Inventory             │");
                 Console.WriteLine("│ 9. Add Book Stocks            │");
-                Console.WriteLine("│ 10. View Users Borrowed Books │");
-                Console.WriteLine("│ 11. Logout                    │");
+                Console.WriteLine("│ 10. Update Book Information   │");
+                Console.WriteLine("│ 11. View Users Borrowed Books │");
+                Console.WriteLine("│ 12. Logout                    │");
                 Console.WriteLine("│ 0. Save and Exit              │");
                 Console.WriteLine("└───────────────────────────────┘\n");
                 Console.ResetColor();
@@ -57,6 +58,7 @@ namespace LibraryManagementSystem
                         Console.WriteLine("Add a New Book");
                         Console.ResetColor();
 
+                        // Prompt for Book Title
                         Console.Write("Enter Book Title: ");
                         string title = Console.ReadLine();
                         if (string.IsNullOrWhiteSpace(title))
@@ -65,6 +67,7 @@ namespace LibraryManagementSystem
                             break;
                         }
 
+                        // Prompt for Author
                         Console.Write("Enter Author: ");
                         string author = Console.ReadLine();
                         if (string.IsNullOrWhiteSpace(author))
@@ -73,6 +76,7 @@ namespace LibraryManagementSystem
                             break;
                         }
 
+                        // Prompt for Year of Publication
                         Console.Write("Enter Year of Publication: ");
                         if (!int.TryParse(Console.ReadLine(), out int yearOfPublication) || yearOfPublication <= 0)
                         {
@@ -80,6 +84,7 @@ namespace LibraryManagementSystem
                             break;
                         }
 
+                        // Prompt for Publisher
                         Console.Write("Enter Publisher: ");
                         string publisher = Console.ReadLine();
                         if (string.IsNullOrWhiteSpace(publisher))
@@ -88,6 +93,7 @@ namespace LibraryManagementSystem
                             break;
                         }
 
+                        // Prompt for Edition
                         Console.Write("Enter Edition: ");
                         string edition = Console.ReadLine();
                         if (string.IsNullOrWhiteSpace(edition))
@@ -96,6 +102,7 @@ namespace LibraryManagementSystem
                             break;
                         }
 
+                        // Prompt for Quantity
                         Console.Write("Enter Quantity: ");
                         if (!int.TryParse(Console.ReadLine(), out int quantity) || quantity < 0)
                         {
@@ -103,8 +110,19 @@ namespace LibraryManagementSystem
                             break;
                         }
 
-                        FileHandler.AddBook(title, author, yearOfPublication, publisher, edition, quantity);
+                        // Prompt for Category (New Addition)
+                        Console.Write("Enter Category: ");
+                        string category = Console.ReadLine();
+                        if (string.IsNullOrWhiteSpace(category))
+                        {
+                            FileHandler.ShowMessageWithDelay("Error: Category cannot be empty.", ConsoleColor.Red);
+                            break;
+                        }
+
+                        // Add the book with the new Category property
+                        FileHandler.AddBook(title, author, yearOfPublication, publisher, edition, quantity, category);
                         break;
+
                     case "2":
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -125,6 +143,7 @@ namespace LibraryManagementSystem
                         Console.WriteLine("Press any key to return to the menu...");
                         Console.ReadKey();
                         break;
+
                     case "3":
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -136,6 +155,7 @@ namespace LibraryManagementSystem
                         Console.WriteLine("\nPress any key to return to the menu...");
                         Console.ReadKey();
                         break;
+
                     case "4":
                         UserManagement user = new UserManagement();
                         Console.Write("Enter new User ID: ");
@@ -177,34 +197,36 @@ namespace LibraryManagementSystem
 
                         FileHandler.ShowMessageWithDelay("User registered successfully! You can now login with your new account.", ConsoleColor.Green);
                         break;
+
                     case "5":
                         List<string> list = new List<string>();
                         list = FileHandler.LoadUsers();
-                        foreach (string users in list)
-                        {
-                            Console.WriteLine($"{users}");
-                        }
+                        
                         Console.Write("Enter User ID to delete: ");
                         string userID = Console.ReadLine();
                         FileHandler.DeleteUser(userID);
                         Console.ReadKey();
                         break;
+
                     case "6":
-                        list = new List<string>();
-                        list = FileHandler.LoadUsers();
-                        foreach (string users in list)
-                        {
-                            Console.WriteLine($"{users}");
-                        }
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("Listing All Users...");
+                        Console.ResetColor();
+
+                        FileHandler.LoadUsers();
+
+                        Console.WriteLine("\nPress any key to return to the menu...");
                         Console.ReadKey();
                         break;
+
                     case "7":
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("Search for a Book by Title");
+                        Console.WriteLine("Search for a Book by Title and/or Category");
                         Console.ResetColor();
 
-                        Console.Write("Enter a keyword to search for books: ");
+                        Console.Write("Enter a keyword to search for books by title: ");
                         string searchKeyword = Console.ReadLine();
 
                         if (string.IsNullOrWhiteSpace(searchKeyword))
@@ -213,8 +235,12 @@ namespace LibraryManagementSystem
                             break;
                         }
 
-                        // Call the SearchBookByTitleWildcard method from FileHandler
-                        List<string> searchResults = FileHandler.SearchBookByTitleWildcard(searchKeyword);
+                        // Ask for category (optional)
+                        Console.Write("Enter a category to search (leave blank to skip): ");
+                        string searchCategory = Console.ReadLine();
+
+                        // Call the updated SearchBook method from FileHandler
+                        List<string> searchResults = FileHandler.SearchBook(searchKeyword, searchCategory);
 
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -231,13 +257,17 @@ namespace LibraryManagementSystem
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"No books found matching the keyword: {searchKeyword}");
+                            string message = string.IsNullOrEmpty(searchCategory) ?
+                                             $"No books found matching the title: {searchKeyword}" :
+                                             $"No books found matching the title: {searchKeyword} and category: {searchCategory}";
+                            Console.WriteLine(message);
                             Console.ResetColor();
                         }
 
                         Console.WriteLine("\nPress any key to return to the menu...");
                         Console.ReadKey();
                         break;
+
                     case "8":
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -249,6 +279,7 @@ namespace LibraryManagementSystem
                         Console.WriteLine("Press any key to return to the menu...");
                         Console.ReadKey();
                         break;
+
                     case "9":
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -277,30 +308,56 @@ namespace LibraryManagementSystem
                         Console.WriteLine("Press any key to return to the menu...");
                         Console.ReadKey();
                         break;
+
                     case "10":
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("Viewing Borrowed Books...");
+                        Console.WriteLine("Update Book Information");
+                        Console.ResetColor();
+
+                        Console.Write("Enter the title of the book to update: ");
+                        string bookTitleToUpdate = Console.ReadLine();
+
+                        if (string.IsNullOrWhiteSpace(bookTitleToUpdate))
+                        {
+                            FileHandler.ShowMessageWithDelay("Error: Book title cannot be empty.", ConsoleColor.Red);
+                            break;
+                        }
+
+                        // Call the UpdateBook method from FileHandler
+                        FileHandler.UpdateBook(bookTitleToUpdate);
+
+                        Console.WriteLine("\nPress any key to return to the menu...");
+                        Console.ReadKey();
+                        break;
+
+                    case "11":
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("Viewing Borrowed Books");
                         Console.ResetColor();
                         FileHandler.ViewBorrowedBooksForLibrarians();
                         Console.WriteLine("\nPress any key to return to the menu...");
                         Console.ReadKey();
                         break;
-                    case "11":
-                        Console.ForegroundColor= ConsoleColor.Green;
+
+                    case "12":
+                        Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Logging out...");
                         Console.ResetColor();
                         Console.WriteLine("Press any key to return to the Login and Register Menu...");
                         Console.ReadKey();
                         Library library = new Library();
                         library.RunLibraryMenu();
-                        return;
+                        break;
+                        
                     case "0":
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Exiting Program... Goodbye!");
                         Console.ResetColor();
                         Environment.Exit(0);
                         break;
+
                     default:
                         Console.ForegroundColor= ConsoleColor.Red;
                         Console.WriteLine("Invalid choice! Please try again.");
